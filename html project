@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </head>
+
+  <body>
+    <div class="container">
+        <h1>Expense Tracker</h1>
+        <form id="expense-form">
+            <input type="text" id="expense-name" placeholder="Expense Name" required />
+            <input type="number" id="expense-amount" placeholder="Amount" required />
+            <select id="expense-category" required>
+                <option value="" disabled selected>Select Category</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Other">Other</option>
+            </select>
+            <button type="submit">Add Expense</button>
+        </form>
+        <div class="expense-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Expense Name</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="expense-list"></tbody>
+            </table>
+        </div>
+       <p id="ty"></p>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+    const expenseForm = document.getElementById("expense-form");
+    const expenseList = document.getElementById("expense-list");
+
+    let expenses = [];
+
+    expenseForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("expense-name").value;
+        const amount = parseFloat(document.getElementById("expense-amount").value);
+        const category = document.getElementById("expense-category").value;
+        localStorage.setItem('name',name);
+        localStorage.setItem('amount',amount);
+        localStorage.setItem('category',category);
+
+
+        const expense = {
+            id:Date.now(),
+            name,
+            amount,
+            category,
+          
+        };
+
+        expenses.push(expense);
+        displayExpenses(expenses);
+    });
+
+    expenseList.addEventListener("click", (e) => {
+        if (e.target.classList.contains("delete-btn")) {
+            const id = parseInt(e.target.dataset.id);
+            expenses = expenses.filter(expense => expense.id !== id);
+            displayExpenses(expenses);
+            updateTotalAmount();
+        }
+
+        if (e.target.classList.contains("edit-btn")) {
+            const id = parseInt(e.target.dataset.id);
+            const expense = expenses.find(expense => expense.id === id);
+
+            document.getElementById("expense-name").value = expense.name;
+            document.getElementById("expense-amount").value = expense.amount;
+            document.getElementById("expense-category").value = expense.category;
+            
+            displayExpenses(expenses);
+        }
+    });
+
+   
+
+    function displayExpenses(expenses) {
+        expenseList.innerHTML = "";
+        expenses.forEach(expense => {
+            const row = document.createElement("tr");
+            
+            row.innerHTML = `
+                <td>${expense.name}</td>
+                <td>$${expense.amount.toFixed(2)}</td>
+                <td>${expense.category}</td>
+                <td>
+                    <button class="edit-btn" data-id="${expense.id}">Edit</button>
+                    <button class="delete-btn" data-id="${expense.id}">Delete</button>
+                </td>
+            `;
+
+            expenseList.appendChild(row);
+        });
+    }
+
+  
+});
+    </script>
+  
+</body>
+   
+</html>
